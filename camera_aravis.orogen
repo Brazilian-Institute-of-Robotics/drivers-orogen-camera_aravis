@@ -19,4 +19,6 @@ task_context 'Task' do
 
     # Specifies the max packet size on an ethernet connection. Default is 1500.
     property('eth_packet_size', 'int', 1500)
+
+    exception_states :LOST_CONNECTION
 end

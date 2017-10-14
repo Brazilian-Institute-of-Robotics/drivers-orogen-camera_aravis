@@ -32,9 +32,11 @@ namespace camera_aravis {
 	~Task();
 
         bool configureHook();
+        void connectionLost();
 
     };
     void triggerFunction(const void *p);
+    void errorFunction(const void *p);
 }
 
 #endif

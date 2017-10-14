@@ -37,10 +37,24 @@ bool Task::configureHook()
 
     cam_interface = camera;
     cam_interface->setCallbackFcn(triggerFunction,this);
+    cam_interface->setErrorCallbackFcn(errorFunction,this);
+
     return true;
+}
+
+void Task::connectionLost()
+{
+
+    RTT::log(RTT::Error) << "Connection Lost" << RTT::endlog();
+    exception(LOST_CONNECTION);
 }
 
 void camera_aravis::triggerFunction(const void *p)
 {
 	((RTT::TaskContext*)p)->getActivity()->trigger();
+}
+
+void camera_aravis::errorFunction(const void *p)
+{
+    ((Task*)p)->connectionLost();
 }
