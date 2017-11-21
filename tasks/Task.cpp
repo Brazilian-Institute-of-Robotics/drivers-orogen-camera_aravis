@@ -7,12 +7,12 @@ using namespace camera;
 using namespace camera_aravis;
 
 Task::Task(std::string const& name)
-    : TaskBase(name)
+    : TaskBase(name), m_lost_connection(false)
 {
 }
 
 Task::Task(std::string const& name, RTT::ExecutionEngine* engine)
-    : TaskBase(name, engine)
+    : TaskBase(name, engine), m_lost_connection(false)
 {
 }
 
@@ -26,6 +26,7 @@ bool Task::configureHook()
     if (! TaskBase::configureHook())
         return false;
 
+    m_lost_connection = false;
     if(_reset_device_on_startup.value())
     	CameraAravis::resetCamera(_camera_id.value());
 
@@ -42,11 +43,19 @@ bool Task::configureHook()
     return true;
 }
 
+void Task::updateHook()
+{
+    if (m_lost_connection)
+        exception(LOST_CONNECTION);
+    else
+        TaskBase::updateHook();
+}
+
 void Task::connectionLost()
 {
 
     RTT::log(RTT::Error) << "Connection Lost" << RTT::endlog();
-    exception(LOST_CONNECTION);
+    m_lost_connection = true;
 }
 
 void camera_aravis::triggerFunction(const void *p)
@@ -57,4 +66,5 @@ void camera_aravis::triggerFunction(const void *p)
 void camera_aravis::errorFunction(const void *p)
 {
     ((Task*)p)->connectionLost();
+    ((RTT::TaskContext*)p)->getActivity()->trigger();
 }

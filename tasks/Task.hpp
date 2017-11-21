@@ -26,11 +26,13 @@ namespace camera_aravis {
     class Task : public TaskBase
     {
 	friend class TaskBase;
+    private:
+        bool m_lost_connection;
     public:
         Task(std::string const& name = "camera_aravis::Task");
         Task(std::string const& name, RTT::ExecutionEngine* engine);
 	~Task();
-
+        void updateHook();
         bool configureHook();
         void connectionLost();
 
